@@ -1,0 +1,8 @@
+-r requirements.txt
+
+pytest>=8
+pytest-asyncio>=0.23
+httpx>=0.27
+# Lets the suite run against in-memory SQLite, so tests need no Neon branch
+# and no network.
+aiosqlite>=0.20

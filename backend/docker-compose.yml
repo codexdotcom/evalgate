@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: evalgate-db
+    environment:
+      POSTGRES_USER: evalgate
+      POSTGRES_PASSWORD: evalgate
+      POSTGRES_DB: evalgate
+    ports:
+      - "5432:5432"
+    volumes:
+      - evalgate_pgdata:/var/lib/postgresql/data
+
+volumes:
+  evalgate_pgdata:

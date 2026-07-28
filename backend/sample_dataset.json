@@ -1,0 +1,26 @@
+{
+  "name": "Smoke test dataset",
+  "description": "Mixed clear and ambiguous cases",
+  "cases": [
+    {
+      "input": "What is the capital of France?",
+      "expected_output": "Paris"
+    },
+    {
+      "input": "What is 17 multiplied by 3?",
+      "expected_output": "51"
+    },
+    {
+      "input": "Name the largest planet in our solar system.",
+      "expected_output": "Jupiter"
+    },
+    {
+      "input": "Is a hot dog a sandwich? Answer yes or no.",
+      "expected_output": "It depends on your definition; there is no single correct answer."
+    },
+    {
+      "input": "Summarize the plot of a good movie in one sentence.",
+      "expected_output": "Any coherent one-sentence plot summary of a well-regarded film."
+    }
+  ]
+}
