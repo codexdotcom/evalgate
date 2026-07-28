@@ -1,26 +1,34 @@
 @import "tailwindcss";
 
+/* One deliberate palette rather than an auto light/dark flip — the scaffold's
+   prefers-color-scheme block would have darkened the page background while
+   leaving every card light. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f7f9;
+  --surface: #ffffff;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-line: var(--border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Long model outputs and judge reasoning arrive as unbroken prose; without
+   this they force the results table into a horizontal scroll. */
+.wrap-anywhere {
+  overflow-wrap: anywhere;
 }
