@@ -3,13 +3,13 @@ import json, os, time
 from typing import Any, Callable, Awaitable
 
 from anthropic import AsyncAnthropic
-from .ratelimit import call_model  # shared retry/backoff, see section 3
+from .ratelimit import call_model
 
 client = AsyncAnthropic()
 
 MAX_STEPS = int(os.getenv("MAX_STEPS", "20"))
 
-# Pricing per token, input/output. Extend as you add models.
+# Per-token pricing, (input, output).
 PRICING: dict[str, tuple[float, float]] = {
     "claude-sonnet-4-6": (3.0 / 1e6, 15.0 / 1e6),
     "claude-haiku-4-5": (1.0 / 1e6, 5.0 / 1e6),
@@ -18,7 +18,7 @@ PRICING: dict[str, tuple[float, float]] = {
 
 
 # ------------------------------------------------------------------ #
-# Tools. Swap this registry for a real sandbox when you have one.
+# Tools
 # ------------------------------------------------------------------ #
 
 ToolFn = Callable[[dict[str, Any]], Awaitable[str]]

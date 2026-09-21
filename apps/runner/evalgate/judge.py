@@ -17,7 +17,7 @@ PROMPT = """You are grading an AI agent's trajectory against a rubric.
 Respond with ONLY this JSON, no prose, no markdown fences:
 {{"passed": true|false, "reason": "<one sentence>"}}"""
 
-# Per-token input/output pricing.
+# Per-token pricing, (input, output).
 PRICING: dict[str, tuple[float, float]] = {
     "claude-sonnet-4-6": (3.0 / 1e6, 15.0 / 1e6),
     "claude-haiku-4-5": (1.0 / 1e6, 5.0 / 1e6),

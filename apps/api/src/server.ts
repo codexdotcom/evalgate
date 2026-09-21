@@ -33,7 +33,6 @@ builder.addScalarType("JSON", GraphQLJSON);
  *
  * $queryRaw cannot validate the shape it returns, so the casts below are
  * an assertion boundary: the SQL is the source of truth, not the type.
- * If these queries grow, parse them through Zod instead of asserting.
  * ------------------------------------------------------------------ */
 
 interface ScoreSummaryRow {
