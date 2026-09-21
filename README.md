@@ -287,8 +287,6 @@ drain-safe shutdown path.
 
 ## Not built yet
 
-Stated plainly, because a roadmap presented as shipped features is worse than
-no roadmap:
 
 - **Auth.** The API is unauthenticated and assumes a trusted network.
 - **Real tool sandbox.** The live agent loop ships stub tools; wire the registry
