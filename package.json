@@ -16,6 +16,9 @@
       "onFail": "download"
     }
   },
+  "pnpm": {
+  "onlyBuiltDependencies": ["prisma", "@prisma/client", "@prisma/engines", "esbuild"]
+},
   "packageManager": "pnpm@12.5.1",
   "type": "module",
   "devDependencies": {
