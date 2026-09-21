@@ -10,7 +10,11 @@ from .execute import run_agent
 log = logging.getLogger("worker")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-SCORERS = [ExactMatch(), ToolCallSequence(), NoLoops(), StepBudget(), LLMJudge()]
+# The judge is registered only when a model is configured for it, so mock
+# and replay runs score deterministically with no provider calls.
+SCORERS = [ExactMatch(), ToolCallSequence(), NoLoops(), StepBudget()]
+if os.getenv("JUDGE_MODEL"):
+    SCORERS.append(LLMJudge())
 CONFIDENCE_FLOOR = float(os.getenv("CONFIDENCE_FLOOR", "0.67"))
 BATCH = int(os.getenv("BATCH", "16"))
 CONCURRENCY = int(os.getenv("CONCURRENCY", "8"))

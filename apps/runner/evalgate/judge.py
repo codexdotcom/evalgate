@@ -1,8 +1,9 @@
 from __future__ import annotations
-import asyncio, json, statistics, time
+import asyncio, json, os, statistics, time
 
 from anthropic import AsyncAnthropic
 
+from .pricing import cost as token_cost
 from .scorers import ScoreResult
 from .ratelimit import call_model
 
@@ -16,12 +17,6 @@ PROMPT = """You are grading an AI agent's trajectory against a rubric.
 
 Respond with ONLY this JSON, no prose, no markdown fences:
 {{"passed": true|false, "reason": "<one sentence>"}}"""
-
-# Per-token pricing, (input, output).
-PRICING: dict[str, tuple[float, float]] = {
-    "claude-sonnet-4-6": (3.0 / 1e6, 15.0 / 1e6),
-    "claude-haiku-4-5": (1.0 / 1e6, 5.0 / 1e6),
-}
 
 MAX_CONTENT_CHARS = 1500
 MAX_TRAJ_CHARS = 20000
@@ -45,8 +40,10 @@ class LLMJudge:
 
     key, kind = "rubric_judge", "llm_judge"
 
-    def __init__(self, model: str = "claude-sonnet-4-6", samples: int = 3) -> None:
-        self.model = model
+    def __init__(self, model: str | None = None, samples: int = 3) -> None:
+        # No judge model configured means no judging. Mock and replay runs
+        # then exercise the pipeline with no provider calls at all.
+        self.model = model or os.getenv("JUDGE_MODEL", "")
         self.samples = samples
 
     async def _vote(self, body: str) -> tuple[dict, object]:
@@ -72,6 +69,12 @@ class LLMJudge:
         return parsed, r.usage
 
     async def score(self, traj: dict, case: dict) -> ScoreResult:
+        if not self.model:
+            return ScoreResult(
+                self.key, self.kind, 0.0, False, 0.0,
+                "judge not configured (set JUDGE_MODEL)", 0.0, 0,
+            )
+
         t0 = time.perf_counter()
 
         compact = [
@@ -97,7 +100,6 @@ class LLMJudge:
         votes: list[int] = []
         reasons: list[str] = []
         cost = 0.0
-        cin, cout = PRICING.get(self.model, (3.0 / 1e6, 15.0 / 1e6))
         errors = 0
 
         for item in raw:
@@ -105,7 +107,7 @@ class LLMJudge:
                 errors += 1
                 continue
             parsed, usage = item
-            cost += usage.input_tokens * cin + usage.output_tokens * cout
+            cost += token_cost(usage.input_tokens, usage.output_tokens, self.model)
             if parsed.get("passed") is None:
                 continue
             votes.append(int(parsed["passed"]))

@@ -148,12 +148,15 @@ mutation { startRun(suiteSlug: "demo", model: "mock-model") { id totalCases } }
 ```
 
 `mock-model` exercises the full pipeline — claim, score, persist, flag,
-calibrate — against synthetic trajectories, with no agent model calls. Replay
-mode does the same for recorded trajectories. Note that the rubric judge is
-registered unconditionally in `worker.SCORERS`, so both paths still call the
-judge; drop `LLMJudge()` from that list for a fully offline run. For a live
-run, set `ANTHROPIC_API_KEY` and pass any model id present in the `PRICING`
-table in `apps/runner/evalgate/execute.py`.
+calibrate — against synthetic trajectories. Replay mode does the same for
+recorded trajectories. Both are fully offline: the rubric judge is registered
+only when `JUDGE_MODEL` is set, so an unconfigured worker scores
+deterministically and makes no provider calls at all.
+
+A live run needs three things — `ANTHROPIC_API_KEY`, a `JUDGE_MODEL`, and a
+model id passed to `startRun`. Cost reporting additionally needs
+`MODEL_PRICING`; without it a run still completes and simply reports zero
+spend.
 
 ### Input format
 
@@ -193,7 +196,7 @@ Every scorer returns the same `ScoreResult`, so adding one is a class with a
 | `tool_sequence` | deterministic | Longest common subsequence against the expected tool order — partial credit, not a boolean. |
 | `no_loops` | programmatic | Flags ≥3 identical consecutive tool calls, the classic agent failure. |
 | `step_budget` | deterministic | Episode stayed within the step cap. |
-| `rubric_judge` | llm_judge | 3-sample self-consistency vote against the case rubric. |
+| `rubric_judge` | llm_judge | 3-sample self-consistency vote against the case rubric. Registered only when `JUDGE_MODEL` is set. |
 
 ## Reading the calibration table
 
@@ -248,6 +251,8 @@ infra/        docker-compose (local) · Kubernetes worker Deployment
 | `MAX_ATTEMPTS` | `3` | Retries before a trajectory is marked `FAILED`. |
 | `STALE_AFTER` | `10 minutes` | Age at which the reaper requeues a stuck `RUNNING` row. |
 | `CONFIDENCE_FLOOR` | `0.67` | Below this, a trajectory is routed to human review. |
+| `JUDGE_MODEL` | unset | Model backing the rubric judge. Unset disables the judge entirely. |
+| `MODEL_PRICING` | `{}` | JSON of `{"model-id": [input, output]}` per-token rates. Unpriced models cost zero. |
 | `MAX_STEPS` | `20` | Agent step cap per episode. |
 | `MODEL_MAX_RETRIES` | `6` | Retry budget per model call. |
 | `MODEL_BASE_DELAY` / `MODEL_MAX_DELAY` | `1.0` / `60.0` | Backoff bounds in seconds. |
