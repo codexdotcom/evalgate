@@ -22,6 +22,18 @@ spec:
                 secretKeyRef: { name: evalgate, key: anthropic-key }
             - name: CONCURRENCY
               value: "8"
+            - name: JUDGE_MODEL
+              valueFrom:
+                configMapKeyRef:
+                  name: evalgate
+                  key: judge-model
+                  optional: true
+            - name: MODEL_PRICING
+              valueFrom:
+                configMapKeyRef:
+                  name: evalgate
+                  key: model-pricing
+                  optional: true
           resources:
             requests: { cpu: "200m", memory: "256Mi" }
             limits: { cpu: "1", memory: "1Gi" }

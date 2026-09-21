@@ -1,4 +1,3 @@
-# apps/runner/evalgate/calibration.py
 def cohens_kappa(judge: list[bool], human: list[bool]) -> tuple[float, float]:
     n = len(judge)
     if n == 0: return 0.0, 0.0

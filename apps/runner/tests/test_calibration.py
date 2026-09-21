@@ -1,4 +1,3 @@
-# apps/runner/tests/test_calibration.py
 from evalgate.calibration import cohens_kappa
 
 def test_perfect_agreement():

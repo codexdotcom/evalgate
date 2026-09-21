@@ -3,22 +3,15 @@ import json, os, time
 from typing import Any, Callable, Awaitable
 
 from anthropic import AsyncAnthropic
-from .ratelimit import call_model  # shared retry/backoff, see section 3
+from .pricing import cost as token_cost
+from .ratelimit import call_model
 
 client = AsyncAnthropic()
 
 MAX_STEPS = int(os.getenv("MAX_STEPS", "20"))
 
-# Pricing per token, input/output. Extend as you add models.
-PRICING: dict[str, tuple[float, float]] = {
-    "claude-sonnet-4-6": (3.0 / 1e6, 15.0 / 1e6),
-    "claude-haiku-4-5": (1.0 / 1e6, 5.0 / 1e6),
-    "mock-model": (0.0, 0.0),
-}
-
-
 # ------------------------------------------------------------------ #
-# Tools. Swap this registry for a real sandbox when you have one.
+# Tools
 # ------------------------------------------------------------------ #
 
 ToolFn = Callable[[dict[str, Any]], Awaitable[str]]
@@ -219,8 +212,9 @@ async def _mock(case: dict[str, Any]) -> dict[str, Any]:
 
 
 def cost_of(traj: dict, model: str) -> float:
-    cin, cout = PRICING.get(model, (0.0, 0.0))
-    return sum(s["input_tokens"] * cin + s["output_tokens"] * cout for s in traj["steps"])
+    return sum(
+        token_cost(s["input_tokens"], s["output_tokens"], model) for s in traj["steps"]
+    )
 
 
 async def run_agent(case: dict[str, Any], model: str) -> dict[str, Any]:

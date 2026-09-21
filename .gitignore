@@ -1,1 +1,16 @@
 node_modules
+dist
+.turbo
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+.idea/
+.vscode/

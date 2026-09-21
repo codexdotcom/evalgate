@@ -12,8 +12,8 @@ from typing import Any
 
 from datasets import load_dataset
 
-# Adjust after inspecting the schema. Each value is a tuple of candidate keys,
-# tried in order, so a rename upstream does not break the whole script.
+# Each value is a tuple of candidate keys, tried in order, so a rename
+# upstream does not break the whole script.
 FIELD_MAP = {
     "instance_id": ("instance_id", "id", "task_id"),
     "problem": ("problem_statement", "issue", "prompt", "text"),
